@@ -1,4 +1,4 @@
-import { TableContainer, styled } from "@mui/material";
+import { TableContainer, collapseClasses, styled } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Tables from "./components/table/Tables";
@@ -64,7 +64,7 @@ const App = () => {
       ),
     },
     {
-      element: <TextFields label="dijos" />,
+      element: <TextFields placeholder="jfiosd" />,
     },
     {
       element: <TextFields />,
@@ -105,37 +105,49 @@ const App = () => {
     zIndex: 3, // Ensure it's above body rows
   });
 
-  type StyledTreeItemProps = {
-    rootNode?: boolean;
-  };
+  const StyledTreeItem = styled<any>(TreeItem)((prop) => {
+    const { isFolder, rootNode, child, theme } = prop;
 
-  console.log(treeItemClasses);
+    const borderColor = "gray";
 
-  const StyledTreeItem = styled(TreeItem)<StyledTreeItemProps>(
-    ({ rootNode }) => {
-      const borderColor = "gray";
+    const bottoms = 24 * (child - 1);
 
-      return {
-        position: "relative",
+    return {
+      position: "relative",
+      zIndex: 10,
+      "&:before": {
+        pointerEvents: "none",
+        content: '""',
+        position: "absolute",
+        borderBottom: !rootNode ? `1px dashed ${borderColor}` : "none",
+        width: isFolder ? 10 : 30,
+        left: -1,
+        top: 12,
+        zIndex: 1,
+      },
+      [`& .${treeItemClasses.root}`]: {
+        zIndex: 10,
         "&:before": {
-          pointerEvents: "none",
-          content: '""',
-          position: "absolute",
-          width: 32,
-          left: -16,
-          top: 12,
-          borderBottom:
-            // only display if the TreeItem is not root node
-            !rootNode ? `1px dashed ${borderColor}` : "none",
+          zIndex: 1,
         },
-        [`& .${treeItemClasses.group}`]: {
-          marginLeft: 16,
-          paddingLeft: 18,
-          borderLeft: `1px dashed ${borderColor}`,
-        },
-      };
-    }
-  );
+      },
+      [`& .${collapseClasses.root}`]: {
+        borderLeft: `1px dashed ${borderColor}`,
+        marginLeft: 15,
+      },
+      // Here is how you might add styles for ::after inside the collapseClasses.root
+      // [`& .${collapseClasses.root}:after`]: {
+      //   width: 1,
+      //   left: 15, // Position it to the right
+      //   height: isFolder ? 21 + bottoms : 0,
+      //   top: 16, // Position it from the top
+      //   pointerEvents: "none",
+      //   content: '""',
+      //   position: "absolute",
+      //   borderLeft: `1px dashed ${borderColor}`,
+      // },
+    };
+  });
 
   return (
     <>
@@ -147,6 +159,7 @@ const App = () => {
       >
         <StyledTreeItem
           rootNode
+          isFolder
           sx={{
             [`&. ${treeViewClasses.root}`]: {
               marginLeft: 15,
@@ -154,14 +167,35 @@ const App = () => {
               borderLeft: `1px dashed #f2f2f2`,
             },
           }}
+          child={1}
           nodeId="1"
           label="Applications"
         >
           <StyledTreeItem nodeId="2" label="Calendar" />
         </StyledTreeItem>
-        <StyledTreeItem rootNode nodeId="5" label="Documents">
+        <StyledTreeItem
+          isFolder
+          child={6}
+          rootNode
+          nodeId="5"
+          label="Documents"
+        >
           <StyledTreeItem nodeId="10" label="OSS" />
-          <StyledTreeItem nodeId="6" label="MUI">
+          <StyledTreeItem isFolder child={1} nodeId="11" label="MUI">
+            <StyledTreeItem isFolder child={1} nodeId="19" label="MUI">
+              <StyledTreeItem nodeId="20" label="index.js" />
+            </StyledTreeItem>
+          </StyledTreeItem>
+          <StyledTreeItem isFolder child={1} nodeId="12" label="MUI">
+            <StyledTreeItem nodeId="8" label="index.js" />
+          </StyledTreeItem>
+          <StyledTreeItem isFolder child={1} nodeId="13" label="MUI">
+            <StyledTreeItem nodeId="8" label="index.js" />
+          </StyledTreeItem>
+          <StyledTreeItem isFolder child={1} nodeId="14" label="MUI">
+            <StyledTreeItem nodeId="8" label="index.js" />
+          </StyledTreeItem>
+          <StyledTreeItem isFolder child={1} nodeId="15" label="MUI">
             <StyledTreeItem nodeId="8" label="index.js" />
           </StyledTreeItem>
         </StyledTreeItem>
