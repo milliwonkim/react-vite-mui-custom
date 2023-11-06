@@ -1,4 +1,9 @@
-import { TableContainer, collapseClasses, styled } from "@mui/material";
+import {
+  SvgIcon,
+  TableContainer,
+  collapseClasses,
+  styled,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Tables from "./components/table/Tables";
@@ -9,12 +14,61 @@ import TableBodys from "./components/table/TableBodys";
 import TextFields from "./components/table/TextFields";
 import Checkboxs from "./components/input/Checkboxs";
 import Buttons from "./components/button/Buttons";
-import {
-  TreeItem,
-  TreeView,
-  treeItemClasses,
-  treeViewClasses,
-} from "@mui/x-tree-view";
+// import { TreeItem, TreeView, treeViewClasses } from "@mui/x-tree-view";
+import { updateBookmark } from "./features/counterSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { RootState } from "./app/store";
+
+const TreeItem = ({ node, onToggleBookmark }: any) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        {node.children && (
+          <button onClick={handleToggle}>{isOpen ? "-" : "+"}</button>
+        )}
+        {node.name}
+        <input
+          type="checkbox"
+          checked={node.isBookMark}
+          onChange={() => dispatch(onToggleBookmark(node.id))}
+        />
+      </div>
+      {isOpen && node.children && (
+        <div style={{ paddingLeft: "20px" }}>
+          {node.children.map((child: any) => (
+            <TreeItem
+              key={child.id}
+              node={child}
+              onToggleBookmark={onToggleBookmark}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TreeView = ({ data, onToggleBookmark }: any) => {
+  return (
+    <div>
+      {data.map((node: any) => (
+        <TreeItem
+          key={node.id}
+          node={node}
+          onToggleBookmark={onToggleBookmark}
+        />
+      ))}
+    </div>
+  );
+};
 
 const App = () => {
   const getKey = <T extends object>(list: T[]): (T & { key: string })[] => {
@@ -25,6 +79,8 @@ const App = () => {
       };
     });
   };
+
+  const dispatch = useDispatch();
 
   const HEADER_ROW_1 = [
     {
@@ -105,53 +161,33 @@ const App = () => {
     zIndex: 3, // Ensure it's above body rows
   });
 
-  const StyledTreeItem = styled<any>(TreeItem)((prop) => {
-    const { isFolder, rootNode, child, theme } = prop;
+  const [pages, setPages] = useState([]);
+  const pageInfo = useSelector((state: RootState) => state.counter.pageInfo);
 
-    const borderColor = "gray";
+  useEffect(() => {
+    setPages(pageInfo);
+  }, [pageInfo]);
 
-    const bottoms = 24 * (child - 1);
-
-    return {
-      position: "relative",
-      zIndex: 10,
-      "&:before": {
-        pointerEvents: "none",
-        content: '""',
-        position: "absolute",
-        borderBottom: !rootNode ? `1px dashed ${borderColor}` : "none",
-        width: isFolder ? 10 : 30,
-        left: -1,
-        top: 12,
-        zIndex: 1,
-      },
-      [`& .${treeItemClasses.root}`]: {
-        zIndex: 10,
-        "&:before": {
-          zIndex: 1,
-        },
-      },
-      [`& .${collapseClasses.root}`]: {
-        borderLeft: `1px dashed ${borderColor}`,
-        marginLeft: 15,
-      },
-      // Here is how you might add styles for ::after inside the collapseClasses.root
-      // [`& .${collapseClasses.root}:after`]: {
-      //   width: 1,
-      //   left: 15, // Position it to the right
-      //   height: isFolder ? 21 + bottoms : 0,
-      //   top: 16, // Position it from the top
-      //   pointerEvents: "none",
-      //   content: '""',
-      //   position: "absolute",
-      //   borderLeft: `1px dashed ${borderColor}`,
-      // },
+  const toggleBookmark = (id: any) => {
+    const toggle = (items: any) => {
+      return items.map((item: any) => {
+        if (item.id === id) {
+          return { ...item, isBookMark: !item.isBookMark };
+        } else if (item.children) {
+          return { ...item, children: toggle(item.children) };
+        }
+        return item;
+      });
     };
-  });
+
+    setPages(toggle(pages));
+  };
 
   return (
     <>
-      <TreeView
+      <button onClick={() => dispatch(updateBookmark(2))}>fjdiso</button>
+      <TreeView data={pages} onToggleBookmark={updateBookmark} />
+      {/* <TreeView
         aria-label="file system navigator"
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
@@ -159,6 +195,7 @@ const App = () => {
       >
         <StyledTreeItem
           rootNode
+          style={{ position: "relatve" }}
           isFolder
           sx={{
             [`&. ${treeViewClasses.root}`]: {
@@ -174,6 +211,7 @@ const App = () => {
           <StyledTreeItem nodeId="2" label="Calendar" />
         </StyledTreeItem>
         <StyledTreeItem
+          style={{ position: "relative" }}
           isFolder
           child={6}
           rootNode
@@ -199,7 +237,7 @@ const App = () => {
             <StyledTreeItem nodeId="8" label="index.js" />
           </StyledTreeItem>
         </StyledTreeItem>
-      </TreeView>
+      </TreeView> */}
       <TableContainer
         sx={{ maxHeight: "500px", overflow: "auto" }}
         component="div"
