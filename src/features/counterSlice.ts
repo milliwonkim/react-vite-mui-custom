@@ -2,9 +2,10 @@ import { createSlice, current } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { PAGE_INFO } from "../constants/pageInfo";
 import { RootState } from "../app/store";
+import { getLocalStorage, setLocalStorage } from "../utils";
 
 const initialState = {
-  pageInfo: PAGE_INFO,
+  pageInfo: getLocalStorage("pageInfo", {}) || PAGE_INFO,
 };
 
 export const counterSlice = createSlice({
@@ -30,6 +31,9 @@ export const counterSlice = createSlice({
       state.pageInfo = [
         ...toggleBookmark(current(state.pageInfo), action.payload),
       ];
+
+      setLocalStorage("pageInfo", JSON.stringify(state.pageInfo));
+
       console.log(state.pageInfo);
       //   console.log(state.pageInfo, current(state.pageInfo));
     },
