@@ -11,6 +11,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
+  FilterFn,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -28,17 +29,19 @@ type Person = {
   age: number;
   visits: number;
   status: string;
-  progress: number;
+  progress: number | string;
+  date: string;
 };
 
 const defaultData: Person[] = [
   {
     firstName: "tanner",
-    lastName: "linsley",
+    lastName: "한글",
     age: 24,
     visits: 100,
     status: "In Relationship",
-    progress: 50,
+    progress: "50",
+    date: "2023-11-13",
   },
   {
     firstName: "tandy",
@@ -47,6 +50,7 @@ const defaultData: Person[] = [
     visits: 40,
     status: "Single",
     progress: 80,
+    date: "2023-11-15",
   },
   {
     firstName: "joe",
@@ -54,6 +58,7 @@ const defaultData: Person[] = [
     age: 45,
     visits: 20,
     status: "Complicated",
+    date: "2023-11-14",
     progress: 10,
   },
 ];
@@ -65,7 +70,6 @@ const columns = [
     id: "firstName",
     header: "firstName",
     enableColumnFilter: true,
-    filterFn: "includesString",
   }),
   columnHelper.accessor("lastName", {
     id: "lastName",
@@ -91,31 +95,40 @@ const columns = [
     id: "status",
     header: "status",
     enableColumnFilter: true,
+    filterFn: "includesString",
     cell: (info) => info.getValue(),
   }),
   columnHelper.accessor("progress", {
     id: "progress",
     header: "progress",
     enableColumnFilter: true,
+
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor("date", {
+    id: "date",
+    header: "date",
+    enableColumnFilter: true,
+
+    filterFn: "getDate",
+
     cell: (info) => info.getValue(),
   }),
 ];
 
-// function DefaultColumnFilter({
-//   column: { filterValue, preFilteredRows, setFilter },
-// }) {
-//   const count = preFilteredRows.length;
+const testFilter: FilterFn<any> = (
+  row,
+  columnId: string,
+  filterValue: unknown
+) => {
+  console.log(columnId, filterValue);
+  return true;
+};
 
-//   return (
-//     <TextField
-//       value={filterValue || ""}
-//       onChange={(e) => {
-//         setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
-//       }}
-//       placeholder={`Search ${count} records...`}
-//     />
-//   );
-// }
+const getDate = (a, b, c) => {
+  console.log("//////", a.getValue(b), b, c.target.value);
+  return a.getValue(b) === c.target.value;
+};
 
 export default function App() {
   const [data, setData] = React.useState(() => [...defaultData]);
@@ -125,6 +138,9 @@ export default function App() {
     columns,
     state: {
       columnFilters,
+    },
+    filterFns: {
+      getDate,
     },
     getCoreRowModel: getCoreRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -203,32 +219,33 @@ export default function App() {
 
 function Filter({
   column,
-  table,
 }: {
   column: Column<any, unknown>;
   table: TanTable<any>;
 }) {
-  const firstValue = table
-    .getPreFilteredRowModel()
-    .flatRows[0]?.getValue(column.id);
+  console.log("////", column.getFilterValue());
 
   const columnFilterValue = column.getFilterValue();
 
-  const sortedUniqueValues = React.useMemo(
-    () =>
-      typeof firstValue === "number"
-        ? []
-        : Array.from(column.getFacetedUniqueValues().keys()).sort(),
-    [column.getFacetedUniqueValues()]
-  );
+  if (column.id === "date") {
+    console.log("columnFilterValue", columnFilterValue);
+    return (
+      <input
+        type="date"
+        value={(columnFilterValue ?? "") as string}
+        onChange={(value) => {
+          console.log("!!!!!", value);
+          column.setFilterValue(value);
+        }}
+        placeholder={`Search... (${column.getFacetedUniqueValues().size})`}
+        className="w-36 border shadow rounded"
+        list={column.id + "list"}
+      />
+    );
+  }
 
   return (
     <>
-      <datalist id={column.id + "list"}>
-        {sortedUniqueValues.slice(0, 5000).map((value: any) => (
-          <option value={value} key={value} />
-        ))}
-      </datalist>
       <DebouncedInput
         type="text"
         value={(columnFilterValue ?? "") as string}
