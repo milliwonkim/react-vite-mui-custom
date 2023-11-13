@@ -4,6 +4,7 @@ import {
   collapseClasses,
   styled,
 } from "@mui/material";
+import { v4 as uuid } from "uuid";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Tables from "./components/table/Tables";
@@ -19,36 +20,17 @@ import { updateBookmark } from "./features/counterSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { RootState } from "./app/store";
+import Trees from "./Trees";
+import ReactTable from "./ReactTable";
 
-const TreeItem = ({ node, onToggleBookmark }: any) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dispatch = useDispatch();
-
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
-
+const TreeNode = ({ node }) => {
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        {node.children && (
-          <button onClick={handleToggle}>{isOpen ? "-" : "+"}</button>
-        )}
-        {node.name}
-        <input
-          type="checkbox"
-          checked={node.isBookMark}
-          onChange={() => dispatch(onToggleBookmark(node.id))}
-        />
-      </div>
-      {isOpen && node.children && (
-        <div style={{ paddingLeft: "20px" }}>
-          {node.children.map((child: any) => (
-            <TreeItem
-              key={child.id}
-              node={child}
-              onToggleBookmark={onToggleBookmark}
-            />
+      {node.name}
+      {node.childNodes && (
+        <div style={{ marginLeft: "20px" }}>
+          {node.childNodes.map((child) => (
+            <TreeNode key={child.id} node={child} />
           ))}
         </div>
       )}
@@ -56,15 +38,12 @@ const TreeItem = ({ node, onToggleBookmark }: any) => {
   );
 };
 
-const TreeView = ({ data, onToggleBookmark }: any) => {
+// Tree component
+const Tree = ({ list }) => {
   return (
     <div>
-      {data.map((node: any) => (
-        <TreeItem
-          key={node.id}
-          node={node}
-          onToggleBookmark={onToggleBookmark}
-        />
+      {list.map((node) => (
+        <TreeNode key={node.id} node={node} />
       ))}
     </div>
   );
@@ -81,6 +60,135 @@ const App = () => {
   };
 
   const dispatch = useDispatch();
+
+  const list = [
+    {
+      name: "",
+      expanded: true,
+      childNodes: [
+        {
+          name: "Section 1",
+          expanded: true,
+          childNodes: [
+            {
+              name: "001",
+              expanded: true,
+              childNodes: [
+                {
+                  name: "1-11-1",
+                },
+              ],
+            },
+            {
+              name: "002",
+              roe: true,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "003",
+              roe: true,
+              calendar: false,
+              selected: false,
+            },
+            {
+              name: "004",
+              roe: true,
+              calendar: false,
+              selected: false,
+            },
+            {
+              name: "005",
+              roe: true,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "006",
+              roe: true,
+              calendar: false,
+              selected: false,
+            },
+          ],
+        },
+        {
+          name: "Section 2",
+          childNodes: [
+            {
+              name: "001",
+              roe: true,
+              calendar: false,
+              selected: false,
+            },
+            {
+              name: "002",
+              roe: false,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "003",
+              roe: true,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "004",
+              roe: false,
+              calendar: true,
+              selected: false,
+            },
+          ],
+        },
+        {
+          name: "Section 3",
+          childNodes: [
+            {
+              name: "001",
+              roe: true,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "002",
+              roe: false,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "003",
+              roe: true,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "004",
+              roe: false,
+              calendar: true,
+              selected: false,
+            },
+          ],
+        },
+        {
+          name: "Section 4",
+          childNodes: [
+            {
+              name: "011",
+              roe: false,
+              calendar: true,
+              selected: false,
+            },
+            {
+              name: "012",
+              roe: true,
+              calendar: false,
+              selected: false,
+            },
+          ],
+        },
+      ],
+    },
+  ];
 
   const HEADER_ROW_1 = [
     {
@@ -182,11 +290,43 @@ const App = () => {
 
     setPages(toggle(pages));
   };
+  const dataPoints = [
+    { x: 10, y: 80 },
+    { x: 30, y: 40 },
+    { x: 50, y: 70 },
+    { x: 70, y: 50 },
+    { x: 90, y: 60 },
+    // Add more points as needed
+  ];
+
+  // Function to generate SVG path for the line
+  const getPath = (points) => {
+    return points
+      .map((point, i) => {
+        if (i === 0) return `M ${point.x},${point.y}`;
+        return `L ${point.x},${point.y}`;
+      })
+      .join(" ");
+  };
+
+  const path = getPath(dataPoints);
 
   return (
     <>
-      <button onClick={() => dispatch(updateBookmark(2))}>fjdiso</button>
-      <TreeView data={pages} onToggleBookmark={updateBookmark} />
+      <svg
+        style={{ border: "1px solid black", margin: "8px" }}
+        width="100%"
+        height="200"
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path stroke="red" strokeWidth={2} d={`M 150 0 L 75 200 L 225 200`} />
+        {/* <path d={path} fill="none" stroke="blue" strokeWidth="2" /> */}
+        {/* {dataPoints.map((point, index) => (
+          <circle key={index} cx={point.x} cy={point.y} r="2" fill="red" />
+        ))} */}
+      </svg>
+
       {/* <TreeView
         aria-label="file system navigator"
         defaultCollapseIcon={<ExpandMoreIcon />}
@@ -238,7 +378,7 @@ const App = () => {
           </StyledTreeItem>
         </StyledTreeItem>
       </TreeView> */}
-      <TableContainer
+      {/* <TableContainer
         sx={{ maxHeight: "500px", overflow: "auto" }}
         component="div"
       >
@@ -282,7 +422,8 @@ const App = () => {
             })}
           </TableBodys>
         </Tables>
-      </TableContainer>
+      </TableContainer> */}
+      <ReactTable />
     </>
   );
 };

@@ -1,0 +1,209 @@
+/* .tree .arrow {
+  cursor: pointer;
+  -webkit-user-select: none;
+
+  -moz-user-select: none;
+
+  -ms-user-select: none;
+
+  user-select: none;
+  color: #307893;
+  font-size: 11pt;
+}
+
+.tree .arrow::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.tree .arrow-down::before {
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.tree .nested {
+  display: none;
+  transition: all 0.5s ease-in-out;
+}
+
+.tree .active {
+  display: block;
+  overflow: hidden;
+}
+
+ul.tree,
+ul.tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.tree ul {
+  margin-left: 10px;
+}
+
+ul.tree li {
+  margin: 0;
+  padding: 0 8px;
+  line-height: 20px;
+  color: #369;
+  font-weight: bold;
+  border-left: 1px solid #0087ac;
+}
+
+ul.tree li:last-child {
+  border-left: none;
+}
+
+ul.tree li:before {
+  position: relative;
+  top: -0.3em;
+  height: 1em;
+  width: 12px;
+  color: white;
+  border-bottom: 1px solid #0087ac;
+  content: "";
+  display: inline-block;
+  left: -8px;
+}
+
+ul.tree li:last-child:before {
+  border-left: 1px solid #0087ac;
+}
+
+.tree .aircraft-wrapper .title-text {
+  color: #000;
+  padding-right: 10px;
+  margin-top: 5px;
+}
+
+.status-bl-wrap {
+  display: flex;
+}
+
+.tree .red-dot {
+  height: 10px;
+  width: 10px;
+  background-color: #ff0000;
+  border-radius: 50%;
+
+  margin-top: 8px;
+  margin-left: 4px;
+}
+
+.tree .green-dot {
+  height: 10px;
+  width: 10px;
+  background-color: #a9d18e;
+  border-radius: 50%;
+
+  margin-top: 8px;
+  margin-left: 4px;
+}
+
+.tree .aircraft-wrapper .title-text {
+  color: #000;
+  padding-right: 10px;
+  margin-top: 5px;
+}
+
+.tree .aircraft-wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.tree .leaf {
+  display: flex;
+  cursor: pointer;
+}
+
+.tree > li:first-child:before {
+  content: "XX";
+  border: none !important;
+}
+
+.tree .active {
+  background-color: unset !important;
+}
+
+.tree .leaf:hover {
+  text-decoration: none;
+  background-color: red;
+}
+
+.tree .leaf.selected {
+  background-color: green;
+} */
+
+ul.tree {
+  width: 100px;
+  margin: 0 auto;
+  padding-top: 48px;
+}
+
+ul li {
+  position: relative;
+  list-style: none;
+  padding: 4px 0;
+}
+
+li:before,
+li:after {
+  content: "";
+  position: absolute;
+  left: -28px;
+  background-color: #979797;
+}
+
+li:before {
+  height: 1px;
+  width: 16px;
+  top: 12px;
+}
+
+li:after {
+  height: 26px;
+  width: 1px;
+  top: -14px;
+}
+
+li.parent:after {
+  height: 100%;
+  top: 12px;
+}
+
+li.parent:last-child:after {
+  content: none;
+}
+
+details {
+  margin: 0 auto;
+}
+
+summary {
+  display: block;
+  position: relative;
+  cursor: pointer;
+}
+
+details > ul {
+  padding: 15px;
+}
+
+summary:before {
+  content: "+";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  top: 0;
+  left: -22px;
+  text-align: center;
+  background-color: #8854d0;
+  line-height: 18px;
+  color: #ffffff;
+  border-radius: 8px;
+  font-weight: 700;
+}
