@@ -66,10 +66,18 @@ const defaultData: Person[] = [
 const columnHelper = createColumnHelper<Person>();
 
 const columns = [
-  columnHelper.accessor("firstName", {
+  columnHelper.group({
     id: "firstName",
     header: "firstName",
     enableColumnFilter: true,
+    columns: [
+      columnHelper.accessor("firstName", {
+        header: (a) => {
+          console.log("HAD1", a);
+          return <Filter column={a.column} />;
+        },
+      }),
+    ],
   }),
   columnHelper.accessor("lastName", {
     id: "lastName",
@@ -109,9 +117,7 @@ const columns = [
     id: "date",
     header: "date",
     enableColumnFilter: true,
-
-    filterFn: "getDate",
-
+    filterFn: "getDate" as any,
     cell: (info) => info.getValue(),
   }),
 ];
@@ -147,8 +153,6 @@ export default function App() {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  console.log("---", table);
-
   return (
     <TableContainer className="p-2">
       <Table>
@@ -170,10 +174,11 @@ export default function App() {
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                console.log("HAD2", header);
                 return (
                   <TableCell key={header.id}>
                     {header.column.getCanFilter() ? (
-                      <Filter column={header.column} table={table} />
+                      <Filter column={header.column} />
                     ) : null}
                   </TableCell>
                 );
@@ -217,12 +222,7 @@ export default function App() {
   );
 }
 
-function Filter({
-  column,
-}: {
-  column: Column<any, unknown>;
-  table: TanTable<any>;
-}) {
+function Filter({ column }: { column: Column<any, unknown> }) {
   console.log("////", column.getFilterValue());
 
   const columnFilterValue = column.getFilterValue();
