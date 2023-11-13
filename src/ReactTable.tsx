@@ -12,6 +12,7 @@ import {
   getFilteredRowModel,
   useReactTable,
   FilterFn,
+  FilterFnOption,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -72,64 +73,88 @@ const columns = [
     enableColumnFilter: true,
     columns: [
       columnHelper.accessor("firstName", {
-        header: (a) => {
-          console.log("HAD1", a);
-          return <Filter column={a.column} />;
+        header: (table) => {
+          return <Filter column={table.column} />;
         },
       }),
     ],
   }),
-  columnHelper.accessor("lastName", {
+  columnHelper.group({
     id: "lastName",
     header: "lastName",
     enableColumnFilter: true,
-    filterFn: "includesString",
+    columns: [
+      columnHelper.accessor("lastName", {
+        header: (table) => {
+          return <Filter column={table.column} />;
+        },
+      }),
+    ],
   }),
-
-  columnHelper.accessor("age", {
+  columnHelper.group({
     id: "age",
     header: "age",
     enableColumnFilter: true,
-    filterFn: "includesString",
-    cell: (info) => info.getValue(),
+    columns: [
+      columnHelper.accessor("age", {
+        header: (table) => {
+          return <Filter column={table.column} />;
+        },
+      }),
+    ],
   }),
-  columnHelper.accessor("visits", {
+
+  columnHelper.group({
     id: "visits",
     header: "visits",
     enableColumnFilter: true,
-    cell: (info) => info.getValue(),
+    columns: [
+      columnHelper.accessor("visits", {
+        header: (table) => {
+          return <Filter column={table.column} />;
+        },
+      }),
+    ],
   }),
-  columnHelper.accessor("status", {
+
+  columnHelper.group({
     id: "status",
     header: "status",
     enableColumnFilter: true,
-    filterFn: "includesString",
-    cell: (info) => info.getValue(),
+    columns: [
+      columnHelper.accessor("status", {
+        header: (table) => {
+          return <Filter column={table.column} />;
+        },
+      }),
+    ],
   }),
-  columnHelper.accessor("progress", {
+  columnHelper.group({
     id: "progress",
     header: "progress",
     enableColumnFilter: true,
-
-    cell: (info) => info.getValue(),
+    columns: [
+      columnHelper.accessor("progress", {
+        header: (table) => {
+          return <Filter column={table.column} />;
+        },
+      }),
+    ],
   }),
-  columnHelper.accessor("date", {
+  columnHelper.group({
     id: "date",
     header: "date",
     enableColumnFilter: true,
-    filterFn: "getDate" as any,
-    cell: (info) => info.getValue(),
+    columns: [
+      columnHelper.accessor("date", {
+        filterFn: "getDate" as any,
+        header: (table) => {
+          return <Filter column={table.column} />;
+        },
+      }),
+    ],
   }),
 ];
-
-const testFilter: FilterFn<any> = (
-  row,
-  columnId: string,
-  filterValue: unknown
-) => {
-  console.log(columnId, filterValue);
-  return true;
-};
 
 const getDate = (a, b, c) => {
   console.log("//////", a.getValue(b), b, c.target.value);
@@ -169,20 +194,6 @@ export default function App() {
                       )}
                 </TableCell>
               ))}
-            </TableRow>
-          ))}
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                console.log("HAD2", header);
-                return (
-                  <TableCell key={header.id}>
-                    {header.column.getCanFilter() ? (
-                      <Filter column={header.column} />
-                    ) : null}
-                  </TableCell>
-                );
-              })}
             </TableRow>
           ))}
         </TableHead>
